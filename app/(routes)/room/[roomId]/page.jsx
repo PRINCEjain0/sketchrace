@@ -6,6 +6,7 @@ import Canvas from "@/components/parts/canvas";
 import { Button } from "@/components/ui/button";
 import RandomWordPicker from "@/components/parts/randomWord";
 import Chat from "@/components/parts/guessChat";
+import FinalScore from "@/components/parts/finalScore";
 export default function RoomPage() {
   const { roomId } = useParams();
   const [socket, setSocket] = useState(null);
@@ -17,6 +18,8 @@ export default function RoomPage() {
   const [drawerId, setDrawerId] = useState(null);
   const [word, setWord] = useState(null);
   const [scores, setScores] = useState({});
+  const [finalScores, setFinalScores] = useState(null);
+  const [showFinalScore, setShowFinalScore] = useState(false);
   useEffect(() => {
     if (!roomId || !nameTrue) return;
 
@@ -26,6 +29,11 @@ export default function RoomPage() {
       console.log("connected to server");
       console.log("id ", newSocket.id);
       newSocket.emit("join", { roomId, name });
+    });
+
+    newSocket.on("final-scores", (scores) => {
+      setFinalScores(scores);
+      setShowFinalScore(true);
     });
 
     newSocket.on("user-list", ({ users, ownerId, gamestarted }) => {
@@ -61,8 +69,9 @@ export default function RoomPage() {
   const handleGmaeStart = () => {
     socket.emit("start-game", roomId);
   };
-  const nextTurn = () => {
-    socket.emit("next-turn", roomId);
+
+  const handleCloseFinalScore = () => {
+    setShowFinalScore(false);
   };
   return (
     <div>
@@ -123,8 +132,9 @@ export default function RoomPage() {
           </li>
         ))}
       </ul>
-      {socket && socket.id === drawerId && (
-        <Button onClick={nextTurn}>Next Turn</Button>
+
+      {showFinalScore && finalScores && (
+        <FinalScore scores={finalScores} onClose={handleCloseFinalScore} />
       )}
     </div>
   );

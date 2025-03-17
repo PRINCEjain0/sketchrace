@@ -10,6 +10,7 @@ export default function Chat({ name, socket, word, roomId, isDrawer }) {
     if (!socket) return;
 
     socket.on("message", (message) => {
+      console.log("Received message:", message);
       setMessages((messages) => [...messages, message]);
     });
 
