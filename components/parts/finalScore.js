@@ -4,10 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Award, Medal } from "lucide-react";
 import confetti from "canvas-confetti";
 
-const FinalScore = ({ scores, onClose, onPlayAgain }) => {
-  const sortedPlayers = Object.entries(scores)
-    .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
-    .map(([name, score], index) => ({ name, score, rank: index + 1 }));
+const FinalScore = ({ scores, userList, onClose, onPlayAgain }) => {
+  const allPlayers = userList.map((user) => ({
+    name: user,
+    score: scores[user] || 0,
+  }));
+
+  const sortedPlayers = allPlayers
+    .sort((a, b) => b.score - a.score)
+    .map((player, index) => ({ ...player, rank: index + 1 }));
 
   React.useEffect(() => {
     const duration = 3 * 1000;
@@ -68,9 +73,9 @@ const FinalScore = ({ scores, onClose, onPlayAgain }) => {
         </h2>
 
         <ul className="space-y-3 mb-6">
-          {sortedPlayers.map((player) => (
+          {sortedPlayers.map((player, id) => (
             <li
-              key={player.name}
+              key={id}
               className={`flex items-center justify-between p-3 rounded-lg ${
                 player.rank <= 3
                   ? "bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100"

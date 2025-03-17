@@ -8,7 +8,7 @@ import RandomWordPicker from "@/components/parts/randomWord";
 import Chat from "@/components/parts/guessChat";
 import FinalScore from "@/components/parts/finalScore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Crown, Pencil } from "lucide-react";
+import { Users, Crown, Pencil, Clock } from "lucide-react";
 
 export default function RoomPage() {
   const { roomId } = useParams();
@@ -19,10 +19,13 @@ export default function RoomPage() {
   const [gameStarted, setGameStarted] = useState(false);
   const [drawerId, setDrawerId] = useState(null);
   const [word, setWord] = useState(null);
+  const [wordHint, setWordHint] = useState(null);
   const [scores, setScores] = useState({});
   const [finalScores, setFinalScores] = useState(null);
   const [showFinalScore, setShowFinalScore] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [hintMessage, setHintMessage] = useState("");
+  const [showHintAnimation, setShowHintAnimation] = useState(false);
 
   useEffect(() => {
     const storedName = localStorage.getItem("playerName");
@@ -66,19 +69,35 @@ export default function RoomPage() {
     newSocket.on("scores-reset", () => {
       setScores({});
     });
+
     newSocket.on("drawer-selected", ({ drawerId, name }) => {
       setDrawerId(drawerId);
+      setWordHint(null);
+      setHintMessage("");
+      setShowHintAnimation(false);
       console.log(`It's ${name}'s turn to draw!`);
     });
 
     newSocket.on("word-to-guess", (word) => {
       setWord(word);
+      setWordHint(null);
+      setHintMessage("");
+    });
+
+    newSocket.on("word-hint", ({ hint, message }) => {
+      console.log("HINT RECEIVED:", hint, message);
+      setWordHint(hint);
+      setHintMessage(message);
+      setShowHintAnimation(true);
+      setTimeout(() => setShowHintAnimation(false), 3000);
     });
 
     newSocket.on("game-ended", () => {
       setGameStarted(false);
       setWord(null);
+      setWordHint(null);
       setDrawerId(null);
+      setHintMessage("");
     });
 
     setSocket(newSocket);
@@ -117,6 +136,40 @@ export default function RoomPage() {
     }
   };
 
+  const displayWordOrHint = () => {
+    if (socket?.id === drawerId) {
+      return (
+        <div className="text-xl font-bold mt-2 bg-indigo-600 text-white py-2 px-4 rounded-full inline-block">
+          Your word: <span className="text-yellow-300">{word}</span>
+        </div>
+      );
+    } else if (wordHint) {
+      return (
+        <div
+          className={`text-xl font-bold mt-2 bg-indigo-600 text-white py-2 px-4 rounded-full inline-block ${
+            showHintAnimation ? "animate-pulse" : ""
+          }`}
+        >
+          <span className="text-red-300 mr-2">
+            <Clock className="inline h-5 w-5 mr-1" />
+            HINT:
+          </span>
+          <span className="text-yellow-300 tracking-wider">{wordHint}</span>
+        </div>
+      );
+    } else if (word) {
+      return (
+        <div className="text-xl font-bold mt-2 bg-indigo-600 text-white py-2 px-4 rounded-full inline-block">
+          Word length:{" "}
+          <span className="text-yellow-300">
+            {word.replace(/[a-zA-Z]/g, "_ ")}
+          </span>
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (!name) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100 flex items-center justify-center p-4">
@@ -146,20 +199,7 @@ export default function RoomPage() {
             SketchRace Room: {roomId}
           </h1>
 
-          {word && socket?.id === drawerId && (
-            <div className="text-xl font-bold mt-2 bg-indigo-600 text-white py-2 px-4 rounded-full inline-block">
-              Your word: <span className="text-yellow-300">{word}</span>
-            </div>
-          )}
-
-          {word && socket?.id !== drawerId && (
-            <div className="text-xl font-bold mt-2 bg-indigo-600 text-white py-2 px-4 rounded-full inline-block">
-              Word length:{" "}
-              <span className="text-yellow-300">
-                {word.replace(/[a-zA-Z]/g, "_ ")}
-              </span>
-            </div>
-          )}
+          {displayWordOrHint()}
         </div>
 
         {!gameStarted ? (
@@ -211,7 +251,6 @@ export default function RoomPage() {
               />
             </div>
 
-            {/* Sidebar */}
             <div className="lg:col-span-1 space-y-6">
               {/* Players List */}
               <Card className="shadow-md">
@@ -285,10 +324,11 @@ export default function RoomPage() {
           scores={finalScores}
           onClose={handleCloseFinalScore}
           onPlayAgain={handlePlayAgain}
+          userList={userList.map((user) => user.name)}
         />
       )}
       {copied && (
-        <div className="flex justify-center items-center  ">
+        <div className="flex justify-center items-center">
           <p className="text-green-500 text-lg z-30">
             Room ID copied to clipboard!
           </p>
