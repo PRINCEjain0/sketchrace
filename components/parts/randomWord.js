@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { generate } from "random-words";
 import { Clock } from "lucide-react";
@@ -37,16 +37,17 @@ export default function RandomWordPicker({ socket, roomId, isDrawer }) {
       const randomWord = words[Math.floor(Math.random() * words.length)];
       handleWordSelect(randomWord);
     }
-  }, [timeLeft, words, wordSelected, showModal]);
+  }, [timeLeft, words, wordSelected, showModal, handleWordSelect]);
 
-  const handleWordSelect = (word) => {
-    setWordSelected(true);
-    setShowModal(false);
-
-    socket.emit("word-selected", { roomId, word });
-
-    socket.emit("force-end-timer", roomId);
-  };
+  const handleWordSelect = useCallback(
+    (word) => {
+      setWordSelected(true);
+      setShowModal(false);
+      socket.emit("word-selected", { roomId, word });
+      socket.emit("force-end-timer", roomId);
+    },
+    [socket, roomId]
+  );
 
   useEffect(() => {
     if (isDrawer) {
@@ -83,7 +84,7 @@ export default function RandomWordPicker({ socket, roomId, isDrawer }) {
         </div>
 
         <p className="mt-4 text-gray-500 text-sm">
-          If you don't choose, a random word will be selected for you.
+          If you don&apos;t choose, a random word will be selected for you.
         </p>
       </div>
     </div>

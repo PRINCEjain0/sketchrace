@@ -98,7 +98,7 @@ export default function Chat({ name, socket, word, roomId, isDrawer }) {
           disabled={guessTimeLeft === 0}
           placeholder={
             isDrawer
-              ? "You can't guess while drawing"
+              ? "You can&apos;t guess while drawing"
               : "Type your guess here..."
           }
           className="flex-1"
@@ -114,7 +114,7 @@ export default function Chat({ name, socket, word, roomId, isDrawer }) {
 
       {isDrawer && (
         <div className="text-center text-sm text-gray-500 mt-2">
-          You can't guess while drawing
+          You can&apos;t guess while drawing
         </div>
       )}
     </div>
