@@ -44,7 +44,7 @@ export default function RoomPage() {
   useEffect(() => {
     if (!roomId || !name) return;
 
-    const newSocket = io("https://server-production-f1ea.up.railway.app/");
+    const newSocket = io("https://server-production-f1ea.up.railway.app");
 
     newSocket.on("connect", () => {
       console.log("connected to server");
