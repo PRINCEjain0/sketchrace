@@ -9,6 +9,15 @@ export default function RandomWordPicker({ socket, roomId, isDrawer }) {
   const [timeLeft, setTimeLeft] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [wordSelected, setWordSelected] = useState(false);
+  const handleWordSelect = useCallback(
+    (word) => {
+      setWordSelected(true);
+      setShowModal(false);
+      socket.emit("word-selected", { roomId, word });
+      socket.emit("force-end-timer", roomId);
+    },
+    [socket, roomId]
+  );
 
   useEffect(() => {
     if (!isDrawer) return;
@@ -38,16 +47,6 @@ export default function RandomWordPicker({ socket, roomId, isDrawer }) {
       handleWordSelect(randomWord);
     }
   }, [timeLeft, words, wordSelected, showModal, handleWordSelect]);
-
-  const handleWordSelect = useCallback(
-    (word) => {
-      setWordSelected(true);
-      setShowModal(false);
-      socket.emit("word-selected", { roomId, word });
-      socket.emit("force-end-timer", roomId);
-    },
-    [socket, roomId]
-  );
 
   useEffect(() => {
     if (isDrawer) {

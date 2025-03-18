@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { io } from "socket.io-client";
-import Canvas from "@/components/parts/canvas";
+import Canvas from "@/components/parts/canvas.jsx";
 import { Button } from "@/components/ui/button";
-import RandomWordPicker from "@/components/parts/randomWord";
-import Chat from "@/components/parts/guessChat";
-import FinalScore from "@/components/parts/finalScore";
+import RandomWordPicker from "@/components/parts/randomWord.jsx";
+import Chat from "@/components/parts/guessChat.jsx";
+import FinalScore from "@/components/parts/finalScore.jsx";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Crown, Pencil, Clock } from "lucide-react";
 
