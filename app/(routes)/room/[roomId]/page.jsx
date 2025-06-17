@@ -44,7 +44,7 @@ export default function RoomPage() {
   useEffect(() => {
     if (!roomId || !name) return;
 
-    const newSocket = io("https://server-ekkr.onrender.com/");
+    const newSocket = io("https://server-whl8.onrender.com/");
 
     newSocket.on("connect", () => {
       console.log("connected to server");
