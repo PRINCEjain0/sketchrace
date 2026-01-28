@@ -1,59 +1,42 @@
-SketchRace
+# SketchRace
 
-SketchRace is a real-time multiplayer drawing and guessing game where one player draws and others try to guess the word as fast as possible.
+- Real-time multiplayer drawing and guessing game
+- One player draws while others guess the word
+- Focused on low-latency and smooth real-time sync
 
-Problem:
+## Problem
+- Real-time games suffer from latency and state mismatch
+- Syncing canvas data across multiple users is challenging
+- Handling joins, leaves, and disconnects is non-trivial
 
-Most real-time games break when latency increases or state goes out of sync between players.
+## How it works
+- Player creates or joins a game room
+- One player is assigned as the drawer
+- Drawing strokes are streamed using WebSockets
+- Other players submit guesses in real time
+- Scores are calculated based on guess speed
+- Turn rotates after each round
 
-SketchRace focuses on low-latency updates and consistent game state across all connected users.
+## Tech stack
 
-How it works:
+Frontend
+- Next.js
+- TypeScript
+- Canvas API
 
-One player is selected as the drawer
-Drawer draws on a shared canvas
-Drawing data is streamed using WebSockets
-Other players submit guesses in real time
-Scores and turns are updated instantly
+Backend
+- Node.js
+- Socket.IO
 
-Tech stack:
+## Why WebSockets
+- Enables real-time bidirectional communication
+- Keeps drawings and guesses in sync
+- Ensures low latency for multiplayer gameplay
 
-Frontend:
-Next.js
-TypeScript
-Canvas API
+## Failure handling
+- Handles player disconnects gracefully
+- Reassigns drawer if a player leaves
+- Maintains consistent game state
 
-Backend:
-Node.js
-Socket.IO
-
-Why WebSockets:
-
-Enables real-time bidirectional communication
-Keeps drawing and guesses in sync
-Low latency for multiplayer gameplay
-
-Game logic:
-
-Turn-based drawing system
-Score calculation based on guess speed
-Player join and leave handling
-Room-based game sessions
-
-Failure handling:
-
-Handles player disconnects gracefully
-Reassigns turns when needed
-Keeps game state consistent
-
-Setup:
-
-Clone the repo.
-Install dependencies.
-Run the server.
-Open multiple tabs to play
-
-Author:
-
-Prince Jain.
-Building real-time systems and interactive products
+## Author
+- Prince Jain
